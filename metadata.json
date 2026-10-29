@@ -1,0 +1,6 @@
+{
+  "name": "AquaCam",
+  "description": "Kamera efek air realistis dengan riak sentuhan, air naik, dan hujan di layar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
