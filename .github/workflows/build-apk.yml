@@ -66,6 +66,7 @@ jobs:
       - name: Publish GitHub Release (Automatic APK Download)
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2
+        continue-on-error: true
         with:
           tag_name: latest
           name: AquaCam v1.0 (Latest Release)
