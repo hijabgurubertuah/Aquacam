@@ -1,4 +1,4 @@
-name: Build AquaCam APK
+name: Build and Release AquaCam APK
 
 on:
   push:
@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main", "master" ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -43,9 +46,31 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
+      - name: Prepare APK Package
+        run: |
+          mkdir -p public
+          APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          if [ -f "$APK_FILE" ]; then
+            cp "$APK_FILE" app/build/outputs/apk/debug/AquaCam.apk
+            cp "$APK_FILE" AquaCam.apk
+            cp "$APK_FILE" public/AquaCam.apk
+          fi
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: AquaCam-Debug-APK
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 14
+          path: app/build/outputs/apk/debug/AquaCam.apk
+          retention-days: 30
+
+      - name: Publish GitHub Release (Automatic APK Download)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: AquaCam v1.0 (Latest Release)
+          draft: false
+          prerelease: false
+          files: app/build/outputs/apk/debug/AquaCam.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
